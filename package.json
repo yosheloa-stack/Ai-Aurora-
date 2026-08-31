@@ -6,6 +6,7 @@
   "scripts": {
     "train": "ts-node src/train.ts",
     "generate": "ts-node src/generate.ts",
+    "search": "ts-node src/search.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit"
   },

@@ -75,6 +75,29 @@ Parâmetros (todos opcionais):
 - Ajuste `HIDDEN_SIZE`, `SEQ_LENGTH` e `LEARNING_RATE` em `src/train.ts` para
   experimentar modelos maiores/menores ou treinos mais rápidos/lentos.
 
+## Buscar na internet
+
+A RNN em si **não tem e não pode ter** acesso à internet — ela só aprende a
+imitar o texto de treino, não a buscar informação nova. Por isso, a busca na
+web é um script separado (`src/search.ts`) que consulta a
+[Brave Search API](https://brave.com/search/api/) (tem free tier, 2.000
+buscas/mês) e imprime os resultados brutos (título, link e resumo) — sem a
+IA interpretar ou usar esses resultados.
+
+1. Crie uma conta gratuita e gere uma chave em https://brave.com/search/api/
+2. Rode:
+
+```bash
+BRAVE_API_KEY=sua_chave npm run search -- "sua busca aqui" 5
+```
+
+O segundo argumento (opcional, padrão `5`) é o número de resultados.
+
+Se você quiser uma IA que de fato **raciocine sobre os resultados da busca**
+e responda perguntas com eles (não só liste links), isso exige um modelo de
+linguagem real com tool use — algo além do escopo desta RNN de brinquedo.
+Me avise se quiser seguir por esse caminho.
+
 ## Limitações
 
 Este é um projeto educacional para entender os fundamentos de como uma IA é
