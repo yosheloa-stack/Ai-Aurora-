@@ -98,6 +98,32 @@ e responda perguntas com eles (não só liste links), isso exige um modelo de
 linguagem real com tool use — algo além do escopo desta RNN de brinquedo.
 Me avise se quiser seguir por esse caminho.
 
+## Outras ferramentas (Tokito APIs)
+
+Além da busca web, há uma CLI com sete ferramentas que consultam a
+[Tokito APIs](https://tokito-apis.com.br): clima, busca na Wikipédia, busca
+no YouTube, filmes, animes, mangás e Pinterest. Assim como a busca web, são
+scripts independentes — não são interpretados pela RNN.
+
+Defina seu token como variável de ambiente (**nunca** o coloque direto no
+código ou em arquivos versionados):
+
+```bash
+export TOKITO_API_KEY=seu_token
+```
+
+Uso:
+
+```bash
+npm run tools -- clima "São Paulo"
+npm run tools -- wikipedia "Inteligência artificial"
+npm run tools -- youtube "lofi"
+npm run tools -- filme "matrix"
+npm run tools -- anime "naruto"
+npm run tools -- manga "naruto"
+npm run tools -- pinterest "gatos"
+```
+
 ## Limitações
 
 Este é um projeto educacional para entender os fundamentos de como uma IA é
