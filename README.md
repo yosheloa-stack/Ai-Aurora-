@@ -122,28 +122,26 @@ npm run tools -- manga "naruto"
 npm run tools -- pinterest "gatos"
 ```
 
-## Servidor de chat para o seu bot (Claude + ferramentas)
+## Servidor de chat para o seu bot (IA de regras, sem API paga)
 
-Este é o motor real para "conversar normal, com respostas diretas, sabendo
-de tudo": um servidor (`src/api/server.ts`) que expõe `POST /chat` e usa a
-API da Claude (Anthropic) com tool use. A IA decide sozinha, durante a
-conversa, quando chamar clima, Wikipédia, YouTube, filme, anime, mangá,
-Pinterest ou busca web — e responde com um tom direto e informal (definido
-no system prompt do arquivo).
+Um servidor (`src/api/server.ts`) que expõe `POST /chat`. O "cérebro" é o
+roteador de regras em `src/api/router.ts`: reconhece a intenção da
+mensagem (saudação, clima, busca de filme/anime/mangá/vídeo/imagem, busca
+geral, etc.) e usa as ferramentas já prontas — sem depender de nenhuma API
+de IA externa, paga ou gratuita.
+
+Isso é mais limitado que um LLM: ele reconhece **padrões** fixos na frase,
+não interpreta perguntas livres com conhecimento geral. Fora dos padrões
+reconhecidos, ele responde com uma mensagem de fallback pedindo para
+reformular.
 
 ### Configuração
 
-Copie `.env.example` para `.env` e preencha:
+Copie `.env.example` para `.env` e preencha `BRAVE_API_KEY` e
+`TOKITO_API_KEY` (usadas pelas ferramentas — se faltar alguma, só aquela
+ferramenta específica retorna erro, sem derrubar o servidor).
 
-- `ANTHROPIC_API_KEY` — obrigatória. Gere em https://console.anthropic.com
-- `BRAVE_API_KEY` e `TOKITO_API_KEY` — necessárias só para as ferramentas
-  que as usam; se faltar alguma, a IA recebe o erro daquela ferramenta
-  específica e pode explicar isso na resposta, sem derrubar o servidor.
-- `CLAUDE_MODEL` — opcional, padrão `claude-opus-5`. Pode trocar por um
-  modelo mais barato (ex. `claude-sonnet-5`) se o custo/latência importar
-  mais que a qualidade máxima.
-
-Rode:
+Rode local:
 
 ```bash
 npm run server
@@ -151,31 +149,43 @@ npm run server
 
 ### Integrando com o seu bot
 
-Seu bot chama o endpoint por HTTP, passando um `userId` (o ID do usuário/chat
-na sua plataforma) e a mensagem:
+Seu bot chama o endpoint por HTTP, passando a mensagem do usuário:
 
 ```bash
 curl -X POST http://localhost:3000/chat \
   -H "Content-Type: application/json" \
-  -d '{"userId": "12345", "message": "qual o clima em São Paulo agora?"}'
+  -d '{"message": "qual o clima em São Paulo agora?"}'
 ```
 
 Resposta:
 
 ```json
-{ "reply": "Tá parcialmente nublado aí, 17.6°C, sensação de 18.3°C, 75% de chance de chuva. Leva um casaco." }
+{ "reply": "São Paulo, São Paulo - Brasil\nCondição: Nublado\nTemperatura: 17.6°C..." }
 ```
 
-O histórico da conversa de cada `userId` fica em memória no processo do
-servidor (últimas 20 mensagens) — reinicia se o servidor reiniciar. Para
-produção com múltiplas instâncias ou persistência entre reinícios, isso
-precisaria de um armazenamento externo (Redis, banco de dados etc.), o que
-está fora do escopo deste projeto por enquanto.
+### Deploy na Square Cloud
+
+O projeto já vem com `squarecloud.app` configurado (`MAIN=src/api/server.ts`,
+`MEMORY=512`, `SUBDOMAIN=ai-aurora`) — a Square Cloud roda TypeScript
+nativamente (via `tsx`), sem precisar de build manual.
+
+1. Troque `SUBDOMAIN` no `squarecloud.app` se `ai-aurora` já estiver em uso
+   por outra pessoa na plataforma.
+2. Compacte o projeto em `.zip` **sem** `node_modules`, `.git`, `.env`,
+   `dist` e `model.json`.
+3. No [dashboard da Square Cloud](https://squarecloud.app/pt-br/dashboard/new),
+   faça upload do zip (ou use a CLI: `npm i -g @squarecloud/cli`,
+   `squarecloud auth login`, `squarecloud upload`).
+4. No painel da aplicação, configure as variáveis de ambiente
+   `BRAVE_API_KEY` e `TOKITO_API_KEY`.
+5. Depois do deploy, sua API fica em `https://ai-aurora.squareweb.app/chat`
+   (ou o subdomínio que você escolheu) — é essa URL que seu bot vai chamar.
 
 ## Limitações
 
-A RNN (`src/rnn.ts`) é um projeto educacional para entender os fundamentos
-de como uma IA é treinada do zero — não é comparável a modelos de linguagem
-em larga escala. O servidor de chat (`src/api/server.ts`), por outro lado,
-usa um LLM real (Claude) e é o que realmente serve para conversar com
-usuários e responder de forma abrangente.
+A RNN (`src/rnn.ts`) e o roteador de regras (`src/api/router.ts`) são as
+duas partes "próprias" deste projeto — nenhuma das duas é um modelo de
+linguagem real. A RNN gera texto por estilo, sem entender perguntas; o
+roteador reconhece padrões fixos nas mensagens. Nenhum dos dois "sabe de
+tudo" como um LLM (Claude, GPT etc.) — isso exigiria bilhões de parâmetros
+e datasets massivos, fora do escopo de um projeto pessoal.
