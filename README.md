@@ -85,10 +85,11 @@ buscas/mês) e imprime os resultados brutos (título, link e resumo) — sem a
 IA interpretar ou usar esses resultados.
 
 1. Crie uma conta gratuita e gere uma chave em https://brave.com/search/api/
-2. Rode:
+2. Coloque em `BRAVE_API_KEY` no seu `.env` (veja `.env.example`)
+3. Rode:
 
 ```bash
-BRAVE_API_KEY=sua_chave npm run search -- "sua busca aqui" 5
+npm run search -- "sua busca aqui" 5
 ```
 
 O segundo argumento (opcional, padrão `5`) é o número de resultados.
@@ -103,12 +104,8 @@ Além da busca web, há uma CLI com sete ferramentas que consultam a
 no YouTube, filmes, animes, mangás e Pinterest. Assim como a busca web, são
 scripts independentes — não são interpretados pela RNN.
 
-Defina seu token como variável de ambiente (**nunca** o coloque direto no
-código ou em arquivos versionados):
-
-```bash
-export TOKITO_API_KEY=seu_token
-```
+Coloque seu token em `TOKITO_API_KEY` no `.env` (**nunca** o coloque
+direto no código ou em arquivos versionados pelo Git).
 
 Uso:
 
@@ -186,17 +183,27 @@ O projeto já vem com `squarecloud.app` configurado (`MAIN=src/api/server.ts`,
 `MEMORY=512`, `SUBDOMAIN=ai-aurora`) — a Square Cloud roda TypeScript
 nativamente (via `tsx`), sem precisar de build manual.
 
+O servidor carrega as chaves automaticamente do arquivo `.env` (via
+`dotenv`) — não precisa configurar variável de ambiente no painel da
+Square Cloud. Isso só funciona porque o `.env` **vai dentro do zip** que
+você faz upload (diferente do Git, o zip não segue o `.gitignore`
+automaticamente — inclua o `.env` manualmente).
+
 1. Troque `SUBDOMAIN` no `squarecloud.app` se `ai-aurora` já estiver em uso
    por outra pessoa na plataforma.
-2. Compacte o projeto em `.zip` **sem** `node_modules`, `.git`, `.env`,
-   `dist` e `model.json`.
+2. Compacte o projeto em `.zip` **sem** `node_modules`, `.git`, `dist` e
+   `model.json` — mas **com** o `.env` (ele tem que estar dentro do zip
+   pra IA funcionar sem configurar nada no painel).
 3. No [dashboard da Square Cloud](https://squarecloud.app/pt-br/dashboard/new),
    faça upload do zip (ou use a CLI: `npm i -g @squarecloud/cli`,
    `squarecloud auth login`, `squarecloud upload`).
-4. No painel da aplicação, configure as variáveis de ambiente
-   `GEMINI_API_KEY`, `BRAVE_API_KEY` e `TOKITO_API_KEY`.
-5. Depois do deploy, sua API fica em `https://ai-aurora.squareweb.app/chat`
+4. Depois do deploy, sua API fica em `https://ai-aurora.squareweb.app/chat`
    (ou o subdomínio que você escolheu) — é essa URL que seu bot vai chamar.
+
+**Sobre o `.env`:** ele nunca é commitado no Git (está no `.gitignore`) —
+por isso, ao subir o projeto pro GitHub, suas chaves não vazam junto. O
+zip pra Square Cloud é um arquivo separado que você monta na sua máquina,
+então incluir o `.env` nele não afeta o repositório.
 
 ## Limitações
 

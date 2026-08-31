@@ -2,12 +2,13 @@
 // youtube, filmes, animes, mangás, pinterest). Assim como o search.ts, é
 // independente da RNN: apenas busca e imprime os dados brutos.
 //
-// Requer TOKITO_API_KEY definida como variável de ambiente.
+// Lê TOKITO_API_KEY do arquivo .env automaticamente.
 //
 // Uso:
-//   TOKITO_API_KEY=seu_token npm run tools -- clima "São Paulo"
-//   TOKITO_API_KEY=seu_token npm run tools -- wikipedia "Brasil"
+//   npm run tools -- clima "São Paulo"
+//   npm run tools -- wikipedia "Brasil"
 
+import "dotenv/config";
 import * as tokito from "./tokito/tools";
 
 const USAGE = `Uso: npm run tools -- <ferramenta> "<consulta>"

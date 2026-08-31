@@ -1,8 +1,10 @@
 // CLI de busca na internet via Brave Search API.
+// Lê BRAVE_API_KEY do arquivo .env automaticamente.
 //
 // Uso:
-//   BRAVE_API_KEY=sua_chave npm run search -- "sua busca aqui"
+//   npm run search -- "sua busca aqui"
 
+import "dotenv/config";
 import { braveSearch } from "./brave/client";
 
 const QUERY = process.argv[2];

@@ -5,6 +5,7 @@
 // quando precisar. Gratuito, sem cartão de crédito, no tier free da
 // Gemini API.
 
+import "dotenv/config";
 import express from "express";
 import { converse } from "./gemini";
 
