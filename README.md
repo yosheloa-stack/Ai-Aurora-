@@ -93,10 +93,8 @@ BRAVE_API_KEY=sua_chave npm run search -- "sua busca aqui" 5
 
 O segundo argumento (opcional, padrão `5`) é o número de resultados.
 
-Se você quiser uma IA que de fato **raciocine sobre os resultados da busca**
-e responda perguntas com eles (não só liste links), isso exige um modelo de
-linguagem real com tool use — algo além do escopo desta RNN de brinquedo.
-Me avise se quiser seguir por esse caminho.
+Uma IA que de fato **raciocine sobre os resultados** (não só liste links)
+usa um LLM real com tool use — é o que o servidor de chat abaixo faz.
 
 ## Outras ferramentas (Tokito APIs)
 
@@ -124,11 +122,60 @@ npm run tools -- manga "naruto"
 npm run tools -- pinterest "gatos"
 ```
 
+## Servidor de chat para o seu bot (Claude + ferramentas)
+
+Este é o motor real para "conversar normal, com respostas diretas, sabendo
+de tudo": um servidor (`src/api/server.ts`) que expõe `POST /chat` e usa a
+API da Claude (Anthropic) com tool use. A IA decide sozinha, durante a
+conversa, quando chamar clima, Wikipédia, YouTube, filme, anime, mangá,
+Pinterest ou busca web — e responde com um tom direto e informal (definido
+no system prompt do arquivo).
+
+### Configuração
+
+Copie `.env.example` para `.env` e preencha:
+
+- `ANTHROPIC_API_KEY` — obrigatória. Gere em https://console.anthropic.com
+- `BRAVE_API_KEY` e `TOKITO_API_KEY` — necessárias só para as ferramentas
+  que as usam; se faltar alguma, a IA recebe o erro daquela ferramenta
+  específica e pode explicar isso na resposta, sem derrubar o servidor.
+- `CLAUDE_MODEL` — opcional, padrão `claude-opus-5`. Pode trocar por um
+  modelo mais barato (ex. `claude-sonnet-5`) se o custo/latência importar
+  mais que a qualidade máxima.
+
+Rode:
+
+```bash
+npm run server
+```
+
+### Integrando com o seu bot
+
+Seu bot chama o endpoint por HTTP, passando um `userId` (o ID do usuário/chat
+na sua plataforma) e a mensagem:
+
+```bash
+curl -X POST http://localhost:3000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"userId": "12345", "message": "qual o clima em São Paulo agora?"}'
+```
+
+Resposta:
+
+```json
+{ "reply": "Tá parcialmente nublado aí, 17.6°C, sensação de 18.3°C, 75% de chance de chuva. Leva um casaco." }
+```
+
+O histórico da conversa de cada `userId` fica em memória no processo do
+servidor (últimas 20 mensagens) — reinicia se o servidor reiniciar. Para
+produção com múltiplas instâncias ou persistência entre reinícios, isso
+precisaria de um armazenamento externo (Redis, banco de dados etc.), o que
+está fora do escopo deste projeto por enquanto.
+
 ## Limitações
 
-Este é um projeto educacional para entender os fundamentos de como uma IA é
-treinada — não é comparável a modelos de linguagem em larga escala (como o
-Claude), que usam arquiteturas muito mais avançadas (Transformers),
-bilhões de parâmetros e datasets massivos. Mas os princípios centrais —
-uma função com parâmetros ajustáveis, treinada por gradiente descendente
-sobre exemplos — são os mesmos.
+A RNN (`src/rnn.ts`) é um projeto educacional para entender os fundamentos
+de como uma IA é treinada do zero — não é comparável a modelos de linguagem
+em larga escala. O servidor de chat (`src/api/server.ts`), por outro lado,
+usa um LLM real (Claude) e é o que realmente serve para conversar com
+usuários e responder de forma abrangente.

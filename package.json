@@ -8,13 +8,19 @@
     "generate": "ts-node src/generate.ts",
     "search": "ts-node src/search.ts",
     "tools": "ts-node src/tools-cli.ts",
+    "server": "ts-node src/api/server.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^20.11.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
+    "express": "^5.2.1"
   }
 }
