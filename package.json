@@ -1,0 +1,18 @@
+{
+  "name": "ai-aurora",
+  "version": "1.0.0",
+  "description": "Uma IA própria: rede neural recorrente (RNN) treinada do zero em TypeScript, sem frameworks de machine learning.",
+  "main": "dist/train.js",
+  "scripts": {
+    "train": "ts-node src/train.ts",
+    "generate": "ts-node src/generate.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

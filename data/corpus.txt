@@ -1,0 +1,42 @@
+Inteligência artificial é a área da ciência da computação que estuda como
+construir sistemas capazes de aprender com dados e tomar decisões. Uma rede
+neural é um modelo matemático inspirado, de forma simplificada, no
+funcionamento dos neurônios do cérebro. Ela é composta por camadas de
+unidades conectadas por pesos numéricos, que são ajustados durante o
+treinamento para que o modelo aprenda padrões presentes nos dados.
+
+Uma rede neural recorrente, ou RNN, é um tipo especial de rede neural feita
+para trabalhar com sequências, como texto, áudio ou séries temporais. A
+principal diferença em relação a uma rede neural comum é que a RNN possui
+uma espécie de memória: o estado oculto. A cada novo elemento da sequência,
+o estado oculto é atualizado combinando a entrada atual com o estado
+anterior, permitindo que informações do passado influenciem previsões
+futuras.
+
+Para treinar uma rede neural, usamos um algoritmo chamado backpropagation,
+que calcula o gradiente da função de perda em relação a cada peso da rede.
+No caso das RNNs, esse processo é chamado de backpropagation through time,
+porque os gradientes precisam ser propagados também ao longo do tempo, isto
+é, através dos vários passos da sequência. Depois de calcular os gradientes,
+um otimizador, como o Adagrad ou o Adam, atualiza os pesos na direção que
+reduz o erro do modelo.
+
+Um modelo de linguagem a nível de caractere aprende a prever qual será o
+próximo caractere de um texto, dado os caracteres anteriores. Embora seja
+simples, esse tipo de modelo consegue aprender padrões surpreendentes, como
+a estrutura de palavras, pontuação e até o estilo geral do texto usado no
+treinamento, desde que o corpus seja grande o suficiente e o treinamento
+dure tempo suficiente.
+
+Construir sua própria inteligência artificial do zero é uma ótima forma de
+entender o que realmente acontece por trás de sistemas mais complexos, como
+os grandes modelos de linguagem usados hoje em dia. Os princípios são os
+mesmos: uma função matemática com muitos parâmetros ajustáveis, treinada
+repetidamente sobre exemplos, até que consiga generalizar e produzir
+respostas úteis para dados que nunca viu antes.
+
+Quanto maior e mais variado for o corpus de treinamento, melhores tendem a
+ser os resultados. Este arquivo é apenas um exemplo pequeno para testar o
+funcionamento do modelo rapidamente. Para obter resultados mais
+interessantes, substitua ou complemente este texto por um corpus maior,
+como livros, artigos ou conversas, sempre respeitando direitos autorais.
