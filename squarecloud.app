@@ -1,7 +1,7 @@
-DISPLAY_NAME=Ai Aurora
-DESCRIPTION=API da IA (clima, wikipedia, youtube, filme, anime, manga, pinterest, busca web) para uso em bot
+DISPLAY_NAME=Aurora
+DESCRIPTION=API da IA Aurora (clima, wikipedia, youtube, filme, anime, manga, pinterest, busca web) para uso em bot
 MAIN=src/api/server.ts
-MEMORY=512
+MEMORY=1024
 VERSION=recommended
-SUBDOMAIN=ai-aurora
+SUBDOMAIN=aurora
 AUTORESTART=true

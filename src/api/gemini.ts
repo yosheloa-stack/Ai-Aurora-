@@ -164,13 +164,18 @@ export async function converse(message: string, previousInteractionId?: string):
   let last: any;
 
   while (true) {
-    last = await client.interactions.create({
-      model: MODEL,
-      system_instruction: buildSystemInstruction(),
-      tools: TOOLS,
-      ...(prevId ? { previous_interaction_id: prevId } : {}),
-      input,
-    });
+    last = await client.interactions.create(
+      {
+        model: MODEL,
+        system_instruction: buildSystemInstruction(),
+        tools: TOOLS,
+        ...(prevId ? { previous_interaction_id: prevId } : {}),
+        input,
+      },
+      // Corta a chamada antes do gateway da hospedagem desistir sozinho
+      // (evita a requisição ficar pendurada sem resposta nenhuma).
+      { timeout: 15000 }
+    );
 
     const functionCalls = last.steps.filter((s: { type: string }) => s.type === "function_call");
 
