@@ -183,27 +183,37 @@ O projeto já vem com `squarecloud.app` configurado (`MAIN=src/api/server.ts`,
 `MEMORY=512`, `SUBDOMAIN=ai-aurora`) — a Square Cloud roda TypeScript
 nativamente (via `tsx`), sem precisar de build manual.
 
-O servidor carrega as chaves automaticamente do arquivo `.env` (via
-`dotenv`) — não precisa configurar variável de ambiente no painel da
-Square Cloud. Isso só funciona porque o `.env` **vai dentro do zip** que
-você faz upload (diferente do Git, o zip não segue o `.gitignore`
-automaticamente — inclua o `.env` manualmente).
+O servidor carrega as chaves automaticamente do `process.env` (via
+`dotenv`, que também lê um `.env` local se existir). **Importante:** a
+Square Cloud exclui o arquivo `.env` do deploy por padrão, por segurança
+— não tem como incluí-lo no zip. Por isso as variáveis precisam ser
+cadastradas no armazenamento de variáveis da própria plataforma (é
+nativo, feito pra isso — não é a mesma coisa que digitar tudo à mão).
 
 1. Troque `SUBDOMAIN` no `squarecloud.app` se `ai-aurora` já estiver em uso
    por outra pessoa na plataforma.
-2. Compacte o projeto em `.zip` **sem** `node_modules`, `.git`, `dist` e
-   `model.json` — mas **com** o `.env` (ele tem que estar dentro do zip
-   pra IA funcionar sem configurar nada no painel).
+2. Compacte o projeto em `.zip` **sem** `node_modules`, `.git`, `dist`,
+   `model.json` e `.env`.
 3. No [dashboard da Square Cloud](https://squarecloud.app/pt-br/dashboard/new),
    faça upload do zip (ou use a CLI: `npm i -g @squarecloud/cli`,
    `squarecloud auth login`, `squarecloud upload`).
-4. Depois do deploy, sua API fica em `https://ai-aurora.squareweb.app/chat`
+4. Envie as variáveis do seu `.env` local pra plataforma **de uma vez só**,
+   sem digitar cada uma:
+
+   ```bash
+   squarecloud app env set --from-file .env --app <seu-appID>
+   squarecloud app restart --app <seu-appID>
+   ```
+
+   O `<seu-appID>` aparece no `squarecloud app list` ou na página da
+   aplicação no dashboard.
+5. Depois do deploy, sua API fica em `https://ai-aurora.squareweb.app/chat`
    (ou o subdomínio que você escolheu) — é essa URL que seu bot vai chamar.
 
-**Sobre o `.env`:** ele nunca é commitado no Git (está no `.gitignore`) —
-por isso, ao subir o projeto pro GitHub, suas chaves não vazam junto. O
-zip pra Square Cloud é um arquivo separado que você monta na sua máquina,
-então incluir o `.env` nele não afeta o repositório.
+**Sobre o `.env`:** ele nunca é commitado no Git (está no `.gitignore`) e
+nunca sobe no zip da Square Cloud — as chaves só existem no seu `.env`
+local e no armazenamento de variáveis da plataforma (configurado pelo
+comando acima), nunca em texto plano dentro do código ou do repositório.
 
 ## Limitações
 
