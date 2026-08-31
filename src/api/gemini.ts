@@ -8,7 +8,7 @@ import * as tokito from "../tokito/tools";
 import { braveSearch } from "../brave/client";
 import { COMMUNITY_FACTS } from "./lore";
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 
 const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
