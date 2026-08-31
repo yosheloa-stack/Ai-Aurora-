@@ -122,24 +122,33 @@ npm run tools -- manga "naruto"
 npm run tools -- pinterest "gatos"
 ```
 
-## Servidor de chat para o seu bot (IA de regras, sem API paga)
+## Servidor de chat para o seu bot (Gemini + ferramentas, gratuito)
 
 Um servidor (`src/api/server.ts`) que expõe `POST /chat`. O "cérebro" é o
-roteador de regras em `src/api/router.ts`: reconhece a intenção da
-mensagem (saudação, clima, busca de filme/anime/mangá/vídeo/imagem, busca
-geral, etc.) e usa as ferramentas já prontas — sem depender de nenhuma API
-de IA externa, paga ou gratuita.
+motor Gemini em `src/api/gemini.ts`: usa a [Gemini API](https://ai.google.dev)
+do Google (gratuita no tier free, **sem cartão de crédito**) com tool use —
+entende qualquer jeito de perguntar (não só comandos fixos) e usa as
+ferramentas prontas (clima, wikipedia, youtube, filme, anime, manga,
+pinterest, busca web) quando a conversa pedir.
 
-Isso é mais limitado que um LLM: ele reconhece **padrões** fixos na frase,
-não interpreta perguntas livres com conhecimento geral. Fora dos padrões
-reconhecidos, ele responde com uma mensagem de fallback pedindo para
-reformular.
+Isso é o que dá conta de perguntas livres/sociais de uma comunidade — "quem
+é o criador", brincadeiras, papo sobre Free Fire, etc. — que um roteador de
+regras (if/regex) não consegue cobrir de verdade.
+
+### Ensinando fatos do seu grupo/comunidade
+
+Edite `src/api/lore.ts` e liste fatos que a IA deve saber (quem é o
+criador, apelidos, regras da guilda, contexto de Free Fire etc.) — ela usa
+isso nas respostas em vez de inventar.
 
 ### Configuração
 
-Copie `.env.example` para `.env` e preencha `BRAVE_API_KEY` e
-`TOKITO_API_KEY` (usadas pelas ferramentas — se faltar alguma, só aquela
-ferramenta específica retorna erro, sem derrubar o servidor).
+1. Gere sua chave gratuita em https://aistudio.google.com/apikey (não pede
+   cartão de crédito).
+2. Copie `.env.example` para `.env` e preencha `GEMINI_API_KEY`, e também
+   `BRAVE_API_KEY`/`TOKITO_API_KEY` (usadas pelas ferramentas — se faltar
+   alguma, só aquela ferramenta específica retorna erro, sem derrubar o
+   servidor).
 
 Rode local:
 
@@ -149,19 +158,27 @@ npm run server
 
 ### Integrando com o seu bot
 
-Seu bot chama o endpoint por HTTP, passando a mensagem do usuário:
+Seu bot chama o endpoint por HTTP, passando um `userId` (o ID do
+usuário/chat na sua plataforma — é assim que a conversa de cada pessoa fica
+separada) e a mensagem:
 
 ```bash
 curl -X POST http://localhost:3000/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "qual o clima em São Paulo agora?"}'
+  -d '{"userId": "12345", "message": "qual o clima em São Paulo agora?"}'
 ```
 
 Resposta:
 
 ```json
-{ "reply": "São Paulo, São Paulo - Brasil\nCondição: Nublado\nTemperatura: 17.6°C..." }
+{ "reply": "Tá nublado aí, 17.6°C, sensação de 18.3°C, 75% de chance de chuva." }
 ```
+
+O histórico de cada `userId` fica associado ao ID da última interação na
+Gemini (gerenciado pela própria API) — guardado em memória no processo do
+servidor. Se o servidor reiniciar, as conversas em andamento recomeçam do
+zero (isso é aceitável pra a maioria dos bots de comunidade; avise se
+precisar de algo mais persistente).
 
 ### Deploy na Square Cloud
 
@@ -177,15 +194,15 @@ nativamente (via `tsx`), sem precisar de build manual.
    faça upload do zip (ou use a CLI: `npm i -g @squarecloud/cli`,
    `squarecloud auth login`, `squarecloud upload`).
 4. No painel da aplicação, configure as variáveis de ambiente
-   `BRAVE_API_KEY` e `TOKITO_API_KEY`.
+   `GEMINI_API_KEY`, `BRAVE_API_KEY` e `TOKITO_API_KEY`.
 5. Depois do deploy, sua API fica em `https://ai-aurora.squareweb.app/chat`
    (ou o subdomínio que você escolheu) — é essa URL que seu bot vai chamar.
 
 ## Limitações
 
-A RNN (`src/rnn.ts`) e o roteador de regras (`src/api/router.ts`) são as
-duas partes "próprias" deste projeto — nenhuma das duas é um modelo de
-linguagem real. A RNN gera texto por estilo, sem entender perguntas; o
-roteador reconhece padrões fixos nas mensagens. Nenhum dos dois "sabe de
-tudo" como um LLM (Claude, GPT etc.) — isso exigiria bilhões de parâmetros
-e datasets massivos, fora do escopo de um projeto pessoal.
+A RNN (`src/rnn.ts`) é um projeto educacional à parte, pra entender os
+fundamentos de como uma IA é treinada do zero — não tem relação com o
+servidor de chat. O servidor de chat (`src/api/server.ts` + `gemini.ts`)
+usa um LLM real (Gemini) e é o que serve pra conversar com usuários de
+verdade — inclusive perguntas livres e sociais que nenhum sistema de
+regras cobriria bem.
